@@ -68,6 +68,12 @@ const locations = [
 		"button text": ["Fight slime", "Fight fanged beast", "Go to town square"],
 		"button functions": [fightSlime, fightBeast, goTown],
 		text: "You enter the cave. You see some monsters."
+	},
+	{
+		name: "fight",
+		"button text": ["Attack", "Dodge", "Run"],
+		"button functions": [attack, dodge, goTown],
+		text: "You are fighting a monster."
 	}
 ];
 
@@ -79,7 +85,13 @@ button3.onclick = fightDragon;
 function goTown() { update(locations[0]); }
 function goStore() { update(locations[1]); }
 function goCave() { update(locations[2]); }
-
+function goFight() {
+	update(locations[3]); 
+	monsterHealth = monsters[fighting].health;
+	monsterStats.style.display = 'block';
+	monsterName.innerText = monsters[fighting].name;
+	monsterHealthText.innerText = monsters[fighting].health;
+}
 
 function buyHealth() {
 	if (gold >= 10) {
@@ -126,9 +138,6 @@ function sellWeapon() {
 	text.innerText = "Don't sell your only weapon!";
 }
 
-function goFight() {
-	
-}
 
 function fightSlime() {
 	fighting = 0;
@@ -136,11 +145,44 @@ function fightSlime() {
 }
 
 function fightBeast() {
-	
+	fighting = 1;
+	goFight();
 }
 
 function fightDragon() {
-	console.log("Fighting dragon.");
+	fighting = 2;
+	goFight();
+}
+
+function attack() {
+	text.innerText = "The " + monsters[fighting].name + " attacks.";
+	text.innerText += " You attack it with your " + weapons[currentWeaponIndex].name + ".";
+	health -= monsters[fighting].level;
+	monsterHealth -= weapons[currentWeaponIndex].power + Math.floor(Math.random() * xp) + 1;
+	healthText.innerText = health;
+	monsterHealthText.innerText = monsterHealth;
+	if (health <= 0) {
+		lose();
+	}
+	else if (monsterHealth <= 0) {
+		defeatMonster();
+	}
+}
+
+function dodge() {
+	text.innerText = "You dodge the attack from the " + monsters[fighting].name;
+}
+
+function lose() {
+
+}
+
+function defeatMonster() {
+	gold += Math.floor(monsters[fighting].level * 6.7);
+	xp += monsters[fighting].level;
+	goldText.innerText = gold;
+	xpText.innerText = xp;
+	update(locations[4]);
 }
 
 function update(location) {
